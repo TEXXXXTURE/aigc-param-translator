@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="900" viewBox="0 0 960 900" role="img" aria-label="AIGC 调参翻译器 翻译循环架构图">
+  <text x="480" y="32" text-anchor="middle" font-size="20" font-weight="700" fill="#1F2329" font-family="'PingFang SC','Microsoft YaHei',sans-serif">AIGC 调参翻译器 · 翻译循环</text>
+
+  <!-- boxes -->
+  <g font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="14" font-weight="600">
+    <rect x="60" y="56" width="560" height="58" rx="10" fill="#F2F3F5" stroke="#C9CDD4"/>
+    <text x="340" y="92" text-anchor="middle" fill="#1F2329">需求（自然语言）</text>
+
+    <rect x="60" y="136" width="560" height="58" rx="10" fill="#F2F3F5" stroke="#C9CDD4"/>
+    <text x="340" y="172" text-anchor="middle" fill="#1F2329">需求解析：平台 / 风格 / 主体场景 / 约束 / 档位</text>
+
+    <rect x="60" y="216" width="560" height="58" rx="10" fill="#F2F3F5" stroke="#C9CDD4"/>
+    <text x="340" y="252" text-anchor="middle" fill="#1F2329">规则路由：命中预设模板 / 00-default 兜底</text>
+
+    <rect x="60" y="296" width="560" height="58" rx="10" fill="#F2F3F5" stroke="#C9CDD4"/>
+    <text x="340" y="332" text-anchor="middle" fill="#1F2329">LLM 槽位填充：只填 schema 槽位 · 带理由与置信度</text>
+
+    <rect x="60" y="376" width="560" height="58" rx="10" fill="#F2F3F5" stroke="#C9CDD4"/>
+    <text x="340" y="412" text-anchor="middle" fill="#1F2329">参数校验：范围 / 依赖 / 平台映射 · 越界即拒</text>
+
+    <rect x="60" y="456" width="560" height="58" rx="10" fill="#EAF1FF" stroke="#3B7CFF"/>
+    <text x="340" y="492" text-anchor="middle" fill="#2B62D9">调参方案 ★ 唯一中间产物 · 每项带调整理由</text>
+
+    <rect x="60" y="536" width="560" height="58" rx="10" fill="#EAF1FF" stroke="#3B7CFF"/>
+    <text x="340" y="572" text-anchor="middle" fill="#2B62D9">解释器：是什么 / 为什么 / 预期效果 / 风险 · 快档 / 全档</text>
+
+    <rect x="60" y="616" width="560" height="58" rx="10" fill="#EAF1FF" stroke="#3B7CFF"/>
+    <text x="340" y="652" text-anchor="middle" fill="#2B62D9">执行路由（写死）：有 API → A；可读屏 → B；否则 / 学习 → C</text>
+  </g>
+
+  <!-- arrows between boxes -->
+  <g stroke="#8A9099" stroke-width="2">
+    <line x1="340" y1="114" x2="340" y2="136"/>
+    <line x1="340" y1="194" x2="340" y2="216"/>
+    <line x1="340" y1="274" x2="340" y2="296"/>
+    <line x1="340" y1="354" x2="340" y2="376"/>
+    <line x1="340" y1="434" x2="340" y2="456"/>
+    <line x1="340" y1="514" x2="340" y2="536"/>
+    <line x1="340" y1="594" x2="340" y2="616"/>
+    <polygon points="336,134 340,143 344,134" fill="#8A9099" stroke="none"/>
+    <polygon points="336,214 340,223 344,214" fill="#8A9099" stroke="none"/>
+    <polygon points="336,294 340,303 344,294" fill="#8A9099" stroke="none"/>
+    <polygon points="336,374 340,383 344,374" fill="#8A9099" stroke="none"/>
+    <polygon points="336,454 340,463 344,454" fill="#8A9099" stroke="none"/>
+    <polygon points="336,534 340,543 344,534" fill="#8A9099" stroke="none"/>
+    <polygon points="336,614 340,623 344,614" fill="#8A9099" stroke="none"/>
+  </g>
+
+  <!-- branch cards -->
+  <g font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="13" font-weight="600">
+    <rect x="60" y="700" width="180" height="72" rx="10" fill="#EAF1FF" stroke="#3B7CFF"/>
+    <text x="150" y="726" text-anchor="middle" fill="#2B62D9">A · API 直连</text>
+    <text x="150" y="750" text-anchor="middle" font-size="11" fill="#646A73">提交即出图 · 可批量回放</text>
+    <rect x="250" y="700" width="180" height="72" rx="10" fill="#E8F7F4" stroke="#4EACD0"/>
+    <text x="340" y="726" text-anchor="middle" fill="#1F7A6E">B · computer use</text>
+    <text x="340" y="750" text-anchor="middle" font-size="11" fill="#646A73">读屏操控 · 每步验证</text>
+    <rect x="440" y="700" width="180" height="72" rx="10" fill="#FDF3E7" stroke="#E8A13C"/>
+    <text x="530" y="726" text-anchor="middle" fill="#C9842A">C · 人工指引</text>
+    <text x="530" y="750" text-anchor="middle" font-size="11" fill="#646A73">在哪 / 做什么 / 填什么 / 预期</text>
+  </g>
+  <line x1="340" y1="674" x2="340" y2="700" stroke="#8A9099" stroke-width="2"/>
+  <polygon points="336,698 340,707 344,698" fill="#8A9099" stroke="none"/>
+
+  <!-- verify & feedback -->
+  <rect x="60" y="800" width="560" height="58" rx="10" fill="#F2F3F5" stroke="#C9CDD4"/>
+  <text x="340" y="836" text-anchor="middle" font-size="14" font-weight="600" fill="#1F2329" font-family="'PingFang SC','Microsoft YaHei',sans-serif">出图校验 → 案例沉淀（成功 / 失败归因）</text>
+  <line x1="340" y1="772" x2="340" y2="800" stroke="#8A9099" stroke-width="2"/>
+  <polygon points="336,798 340,807 344,798" fill="#8A9099" stroke="none"/>
+
+  <!-- feedback loop -->
+  <path d="M 640 829 L 700 829 L 700 245 L 622 245" fill="none" stroke="#3B7CFF" stroke-width="2" stroke-dasharray="6 4"/>
+  <polygon points="620,245 628,240 628,250" fill="#3B7CFF" stroke="none"/>
+  <text x="704" y="560" font-size="12" fill="#2B62D9" font-family="'PingFang SC','Microsoft YaHei',sans-serif" transform="rotate(90 704 560)">更新预设库 / 参数语义库 / 指引库</text>
+  <text x="480" y="878" text-anchor="middle" font-size="12" fill="#8A9099" font-family="'PingFang SC','Microsoft YaHei',sans-serif">翻译而非生成 · 预设管易用 · 原子参数管可控 · 人必须懂参数 · 执行三路兜底</text>
+</svg>

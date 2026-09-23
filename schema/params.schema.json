@@ -1,0 +1,383 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/TEXXXXTURE/aigc-param-translator/schema/params.schema.json",
+  "title": "AIGC 原子参数 Schema（参数空间注册表）",
+  "description": "参数空间的唯一机器可读定义。翻译器只允许填充 registry 中定义的槽位；每个参数条目含类型/范围/默认值/语义五要素/平台映射。语义五要素的详细叙述见 knowledge/params.md，本文件为可校验的精简版。",
+  "type": "object",
+  "required": ["registry", "$defs"],
+  "registry": {
+    "base_model": {
+      "name": "base_model", "label": "模型基座", "type": "string", "default": null,
+      "range": ["SD1.5", "SDXL", "FLUX", "doubao-seedream", "即梦4.0", "可灵", "混元", "平台默认"],
+      "unit": null,
+      "platform_map": { "ComfyUI": "checkpoint / base model", "即梦": "平台默认", "可灵": "平台默认", "豆包": "模型版本参数" },
+      "semantics": {
+        "what": "决定生成风格与能力的基座模型。",
+        "effect": "风格底子、质量上限、生态（LoRA 兼容性）都由此决定。",
+        "direction": "写实选 SDXL/FLUX/doubao-seedream 系；动漫选动漫向模型；未指定用平台默认。",
+        "typical_range": "按平台可用列表选择",
+        "pitfalls": ["跨基座混用 LoRA（如 SD1.5 的 LoRA 用在 SDXL 上）会失效", "误以为模型越新越好而忽略风格匹配"]
+      }
+    },
+    "model_variant": {
+      "name": "model_variant", "label": "模型变体/风格版", "type": "string", "default": null,
+      "range": null, "unit": null,
+      "platform_map": { "ComfyUI": "model name 后缀", "即梦": "风格模型选择", "可灵": "待补", "豆包": "待补" },
+      "semantics": {
+        "what": "同一基座下的风格化变体或版本。",
+        "effect": "在同一基座内决定具体画风（写实/动漫/水墨…）。",
+        "direction": "按需求风格选择；不确定时留平台默认。",
+        "typical_range": "按平台可用列表选择",
+        "pitfalls": ["变体名记错导致风格完全不对"]
+      }
+    },
+    "sampler": {
+      "name": "sampler", "label": "采样器", "type": "string", "default": "DPM++ 2M Karras",
+      "range": ["Euler a", "Euler", "DPM++ 2M", "DPM++ 2M Karras", "DPM++ SDE Karras", "DDIM", "平台默认"],
+      "unit": null,
+      "platform_map": { "ComfyUI": "sampler_name / scheduler", "即梦": "待补", "可灵": "待补", "豆包": "待补" },
+      "semantics": {
+        "what": "扩散去噪的数值求解器，决定每步如何从噪声走向图像。",
+        "effect": "收敛速度、细节锐利度、随机纹理风格。",
+        "direction": "通用求稳 DPM++ 2M Karras；要锐利细节 DPM++ SDE（更慢）；动漫 Euler a 顺手。",
+        "typical_range": "上述枚举；无对应项用平台默认",
+        "pitfalls": ["采样器与调度器不匹配报错", "换采样器后效果大变却不改步数"]
+      }
+    },
+    "steps": {
+      "name": "steps", "label": "步数", "type": "integer", "default": 28,
+      "range": [1, 150], "unit": "步",
+      "platform_map": { "ComfyUI": "steps", "即梦": "待补", "可灵": "待补", "豆包": "待补" },
+      "semantics": {
+        "what": "去噪迭代次数。",
+        "effect": "过少细节不足/结构不稳，过多收益递减且更慢。",
+        "direction": "写实 28–35；动漫 25–30；概念大场景 30–35。",
+        "typical_range": "20–40（通用）；<15 易崩，>40 收益极小",
+        "pitfalls": ["把步数当 CFG 调：加步数救不了方向错误", "高步数+差采样器反而更脏"]
+      }
+    },
+    "cfg": {
+      "name": "cfg", "label": "CFG 引导强度", "type": "number", "default": 7,
+      "range": [1, 30], "unit": null,
+      "platform_map": { "ComfyUI": "cfg", "即梦": "提示词强度(近似)", "可灵": "待补", "豆包": "待补" },
+      "semantics": {
+        "what": "模型遵循提示词的强度。",
+        "effect": "越高越贴提示词；过高过饱和/生硬，过低主体散架。",
+        "direction": "写实 5–6.5，风格化 7–9；结果散提 CFG，过饱和/塑料感降 CFG。",
+        "typical_range": "4–12；>15 视为异常需复核",
+        "pitfalls": [">12 色彩过饱和轮廓生硬", "<3 主体散架", "白底产品图过高出塑料感"]
+      }
+    },
+    "seed": {
+      "name": "seed", "label": "种子", "type": "integer", "default": null,
+      "range": null, "unit": null,
+      "platform_map": { "ComfyUI": "seed", "即梦": "待补", "可灵": "待补", "豆包": "待补" },
+      "semantics": {
+        "what": "随机噪声的初始种子，同参数下固定种子得到可复现结果。",
+        "effect": "控制每次生成的随机性；用于迭代对比与系列一致性。",
+        "direction": "迭代时固定种子改单参数做 A/B；换构图时换种子。",
+        "typical_range": "任意整数；null=随机",
+        "pitfalls": ["不固定种子无法对比参数效果", "误以为种子唯一决定画面风格"]
+      }
+    },
+    "batch_size": {
+      "name": "batch_size", "label": "批量生成数", "type": "integer", "default": 1,
+      "range": [1, 8], "unit": "张",
+      "platform_map": { "ComfyUI": "batch_size", "即梦": "生成数量", "可灵": "待补", "豆包": "生成数量" },
+      "semantics": {
+        "what": "一次生成几张供挑选。",
+        "effect": "提高命中率（可配合种子变化），成本成倍。",
+        "direction": "初筛 4–8 张；锁定方向后回 1–2 张精修。",
+        "typical_range": "1–8",
+        "pitfalls": ["批量≠多样性：同种子批量可能高度雷同", "API 场景批量费用翻倍"]
+      }
+    },
+    "width": {
+      "name": "width", "label": "宽度", "type": "integer", "default": 1024,
+      "range": [256, 2048], "unit": "px",
+      "platform_map": { "ComfyUI": "width", "即梦": "尺寸选择", "可灵": "待补", "豆包": "尺寸参数" },
+      "semantics": {
+        "what": "画布宽度像素。",
+        "effect": "决定构图比例与细节总量；非标准尺寸可能裁切或变形。",
+        "direction": "按载体比例算（1:1/4:5/16:9…），避免极端窄长。",
+        "typical_range": "512–1536（平台默认优先）",
+        "pitfalls": ["小图硬放大只会糊，放大要配合重绘/放大模型", "非模型训练尺寸出构图异常"]
+      }
+    },
+    "height": {
+      "name": "height", "label": "高度", "type": "integer", "default": 1024,
+      "range": [256, 2048], "unit": "px",
+      "platform_map": { "ComfyUI": "height", "即梦": "尺寸选择", "可灵": "待补", "豆包": "尺寸参数" },
+      "semantics": {
+        "what": "画布高度像素。",
+        "effect": "与 width 共同决定比例；竖版海报等载体需明确。",
+        "direction": "按载体比例算；套图统一比例。",
+        "typical_range": "512–1536（平台默认优先）",
+        "pitfalls": ["宽高比超过平台上限被裁切", "比例不一致导致系列图排版难统一"]
+      }
+    },
+    "aspect_ratio": {
+      "name": "aspect_ratio", "label": "画幅比例", "type": "string", "default": "1:1",
+      "range": ["1:1", "4:5", "3:4", "2:3", "9:16", "16:9", "3:2", "2.35:1"],
+      "unit": null,
+      "platform_map": { "ComfyUI": "width/height 换算", "即梦": "比例选择", "可灵": "比例选择", "豆包": "比例参数" },
+      "semantics": {
+        "what": "画布长宽比，独立于像素值的构图维度。",
+        "effect": "决定构图骨架：海报竖版、世界观横版、社媒 4:5。",
+        "direction": "按载体与用途定；系列图固定一个比例。",
+        "typical_range": "上述枚举",
+        "pitfalls": ["海报用 1:1 导致构图平庸", "纵横比与像素值矛盾（如 16:9 配 1024×1024）"]
+      }
+    },
+    "hires_fix": {
+      "name": "hires_fix", "label": "高清修复", "type": "boolean", "default": false,
+      "range": [true, false], "unit": null,
+      "platform_map": { "ComfyUI": "Hires.fix", "即梦": "待补", "可灵": "待补", "豆包": "待补" },
+      "semantics": {
+        "what": "先生成低分辨率再放大重绘，改善高分辨率下的人体/细节。",
+        "effect": "高分辨率下减少结构崩坏；需要额外时间。",
+        "direction": "目标分辨率 >1.5 倍基础分辨率时开启。",
+        "typical_range": "开启/关闭",
+        "pitfalls": ["放大重绘幅度(denoise)过高会把脸改样", "小图不需要开，纯增加耗时"]
+      }
+    },
+    "upscale_scale": {
+      "name": "upscale_scale", "label": "放大倍数", "type": "number", "default": 2,
+      "range": [1, 4], "unit": "倍",
+      "platform_map": { "ComfyUI": "upscale_by", "即梦": "待补", "可灵": "待补", "豆包": "待补" },
+      "semantics": {
+        "what": "最终分辨率相对初始的放大倍数。",
+        "effect": "决定输出清晰度与耗时。",
+        "direction": "常规 2 倍；宣传物料 3–4 倍配合放大模型。",
+        "typical_range": "1.5–4",
+        "pitfalls": ["纯放大不重绘只会虚化", "倍数过高且无放大模型时纹理脏乱"]
+      }
+    },
+    "denoise": {
+      "name": "denoise", "label": "重绘幅度", "type": "number", "default": 0.4,
+      "range": [0, 1], "unit": null,
+      "platform_map": { "ComfyUI": "denoise", "即梦": "待补", "可灵": "待补", "豆包": "待补" },
+      "semantics": {
+        "what": "图生图/放大时保留原图多少、重绘多少。",
+        "effect": "0=原样，1=完全重画。控制改动强度。",
+        "direction": "微调 0.2–0.35；改光影 0.4–0.55；重构图 0.6+。",
+        "typical_range": "0.2–0.6（放大修复常用 0.3–0.4）",
+        "pitfalls": ["放大时 denoise 过高人物变样", "想保留细节却用 >0.5 全糊掉"]
+      }
+    },
+    "prompt": {
+      "name": "prompt", "label": "正向提示词", "type": "string", "default": null,
+      "range": null, "unit": null,
+      "platform_map": { "ComfyUI": "positive prompt", "即梦": "描述词", "可灵": "提示词", "豆包": "prompt" },
+      "semantics": {
+        "what": "描述想要画面的文本。",
+        "effect": "最重要的语义输入；结构（主体/环境/风格/光线/质量词）决定可用性。",
+        "direction": "按 prompt_structure 五段式组织；需求里已有的细节全部保留。",
+        "typical_range": "建议 50–150 词（平台不同有上限）",
+        "pitfalls": ["只写抽象词（高级/好看/宏大）模型无法定位", "堆砌不相关质量词稀释注意力"]
+      }
+    },
+    "negative_prompt": {
+      "name": "negative_prompt", "label": "负面提示词", "type": "string", "default": "lowres, bad anatomy, extra fingers, blurry, watermark, text",
+      "range": null, "unit": null,
+      "platform_map": { "ComfyUI": "negative prompt", "即梦": "待补", "可灵": "待补", "豆包": "待补" },
+      "semantics": {
+        "what": "明确不要出现在画面里的内容。",
+        "effect": "压低指定问题出现的概率（不能绝对禁止）。",
+        "direction": "按体裁追加：写实+塑料感/过度锐化；动漫+写实感/3D 渲染。",
+        "typical_range": "5–15 项关键词",
+        "pitfalls": ["负面词不是屏蔽词：只能降概率", "负面词过多反而干扰主体生成"]
+      }
+    },
+    "prompt_structure": {
+      "name": "prompt_structure", "label": "提示词结构", "type": "string", "default": "主体/环境/风格/光线/质量词 五段式",
+      "range": null, "unit": null,
+      "platform_map": { "ComfyUI": "组织约定", "即梦": "组织约定", "可灵": "组织约定", "豆包": "组织约定" },
+      "semantics": {
+        "what": "提示词的段落组织约定，不是独立参数而是写作规范。",
+        "effect": "结构清晰 → 模型理解更准；乱序 → 重点丢失。",
+        "direction": "按预设卡的提示词结构写；参考素材优先时描述可简。",
+        "typical_range": "五段式",
+        "pitfalls": ["把全部信息压成一句话", "权重语法写错（括号不配对）导致解析失败"]
+      }
+    },
+    "tag_weight": {
+      "name": "tag_weight", "label": "权重语法", "type": "string", "default": null,
+      "range": null, "unit": null,
+      "platform_map": { "ComfyUI": "(tag:1.2)", "即梦": "待补", "可灵": "待补", "豆包": "待补" },
+      "semantics": {
+        "what": "强调某词组的语法，如 (word:1.2)、(word)。",
+        "effect": "放大/缩小某概念对画面的影响。",
+        "direction": "关键特征 1.1–1.3；次要元素 0.8–0.9；少用 >1.5。",
+        "typical_range": "0.5–1.5（超出易失衡）",
+        "pitfalls": ["滥用高权重导致过饱和/堆叠", "跨平台语法不兼容（部分平台不支持）"]
+      }
+    },
+    "reference_images": {
+      "name": "reference_images", "label": "参考图", "type": "array", "default": [],
+      "range": null, "unit": null,
+      "platform_map": { "ComfyUI": "Load Image / reference node", "即梦": "参考图上传（最多10张）", "可灵": "参考素材", "豆包": "参考图参数" },
+      "semantics": {
+        "what": "作为内容或风格锚点的输入图片列表。",
+        "effect": "角色/产品/画风一致性的最强手段；比提示词稳定。",
+        "direction": "角色/产品用 content 参考；画风用 style 参考；多图各司其职。",
+        "typical_range": "0–10 张（平台上限不同）",
+        "pitfalls": ["参考图类别混用（风格图当角色图）导致崩坏", "参考图过多反而让模型自由发挥"]
+      }
+    },
+    "ref_strength": {
+      "name": "ref_strength", "label": "参考强度", "type": "number", "default": 0.7,
+      "range": [0, 1], "unit": null,
+      "platform_map": { "即梦": "参考强度", "可灵": "参考程度", "ComfyUI": "IPAdapter weight 近似", "豆包": "待补" },
+      "semantics": {
+        "what": "生成结果贴合参考图的程度。",
+        "effect": "越高越像参考（含构图），越低越自由。",
+        "direction": "内容参考 0.7–0.9；风格参考 0.5–0.75；多参考取中。",
+        "typical_range": "0.4–0.9",
+        "pitfalls": [">0.95 构图姿态被锁死", "过低头部/产品特征漂移"]
+      }
+    },
+    "ref_type": {
+      "name": "ref_type", "label": "参考类型", "type": "string", "default": "style",
+      "range": ["style", "content", "multi"], "unit": null,
+      "platform_map": { "即梦": "参考图类型选择", "可灵": "形象/环境/动态/声音分类", "ComfyUI": "IPAdapter mode", "豆包": "待补" },
+      "semantics": {
+        "what": "参考图承担的角色：风格（画风/氛围）还是内容（主体/角色/产品）。",
+        "effect": "类型定错则参考效果完全相反。",
+        "direction": "角色/产品/地标=content；画风/色调=style；复杂多图=multi 且按类分工。",
+        "typical_range": "style / content / multi",
+        "pitfalls": ["角色图误设为 style → 每次换脸", "多图不分类 → 模型混淆主次"]
+      }
+    },
+    "controlnet_type": {
+      "name": "controlnet_type", "label": "ControlNet 类型", "type": "string", "default": null,
+      "range": ["lineart", "canny", "depth", "pose", "seg", "scribble", "tile"],
+      "unit": null,
+      "platform_map": { "ComfyUI": "ControlNet type", "即梦": "待补", "可灵": "待补", "豆包": "待补" },
+      "semantics": {
+        "what": "用额外条件（线条/深度/姿态/分割）约束画面结构。",
+        "effect": "精确控制构图、动作、版面；条件图决定骨架。",
+        "direction": "保形用 lineart/canny；场景空间用 depth；人物动作用 pose。",
+        "typical_range": "上述枚举",
+        "pitfalls": ["需要对应预处理器（没跑预处理直接报错）", "权重过高线条生硬"
+        ]
+      }
+    },
+    "controlnet_weight": {
+      "name": "controlnet_weight", "label": "ControlNet 权重", "type": "number", "default": 0.8,
+      "range": [0, 2], "unit": null,
+      "platform_map": { "ComfyUI": "controlnet strength", "即梦": "待补", "可灵": "待补", "豆包": "待补" },
+      "semantics": {
+        "what": "条件图对生成的约束强度。",
+        "effect": "越高越贴条件图（可能僵硬），越低越自由（可能跑形）。",
+        "direction": "0.6–0.9 通用；精确对位可到 1.0+；要留余地 0.5。",
+        "typical_range": "0.5–1.2",
+        "pitfalls": [">1.3 线条/结构生硬不自然", "权重与参考强度叠加时互相打架"]
+      }
+    },
+    "controlnet_range": {
+      "name": "controlnet_range", "label": "ControlNet 生效步范围", "type": "string", "default": "0.0-1.0",
+      "range": ["0.0-1.0", "0.0-0.6", "0.2-1.0", "自定义"],
+      "unit": null,
+      "platform_map": { "ComfyUI": "start/end percent", "即梦": "待补", "可灵": "待补", "豆包": "待补" },
+      "semantics": {
+        "what": "条件约束在前多少比例的去噪步中生效。",
+        "effect": "前段生效定结构，后段放开保自然。",
+        "direction": "结构严控 0.0-1.0；要自然感 0.0-0.6（后半程自由发挥）。",
+        "typical_range": "0.0-1.0 或 0.0-0.6",
+        "pitfalls": ["范围设错导致约束失效或过度僵硬"]
+      }
+    },
+    "lora": {
+      "name": "lora", "label": "LoRA 列表", "type": "array", "default": [],
+      "range": null, "unit": null,
+      "platform_map": { "ComfyUI": "LoRA loader", "即梦": "风格模型/待补", "可灵": "待补", "豆包": "待补" },
+      "semantics": {
+        "what": "叠加的 LoRA 模型列表（角色/风格/概念）。",
+        "effect": "把特定角色/画风/概念注入生成，一致性最强手段之一。",
+        "direction": "按目标选；多 LoRA 注意基座兼容与权重平衡。",
+        "typical_range": "0–3 个",
+        "pitfalls": ["基座不匹配直接报错", "多 LoRA 叠加互相干扰"
+        ]
+      }
+    },
+    "lora_weight": {
+      "name": "lora_weight", "label": "LoRA 权重", "type": "number", "default": 0.6,
+      "range": [0, 2], "unit": null,
+      "platform_map": { "ComfyUI": "strength_model", "即梦": "待补", "可灵": "待补", "豆包": "待补" },
+      "semantics": {
+        "what": "LoRA 对结果的影响强度。",
+        "effect": "过高过拟合（僵化/特征炸），过低特征不明显。",
+        "direction": "角色 0.5–0.7；风格 0.6–0.8；微调 0.3–0.5。",
+        "typical_range": "0.3–0.9",
+        "pitfalls": [">1.0 角色表情姿态僵化", "低权重下期望的资产特征没出现"
+        ]
+      }
+    },
+    "lora_triggers": {
+      "name": "lora_triggers", "label": "LoRA 触发词", "type": "string", "default": null,
+      "range": null, "unit": null,
+      "platform_map": { "ComfyUI": "prompt 中触发词", "即梦": "待补", "可灵": "待补", "豆包": "待补" },
+      "semantics": {
+        "what": "激活 LoRA 所需写入提示词的触发词（若有）。",
+        "effect": "不写触发词 LoRA 可能完全不生效。",
+        "direction": "从 LoRA 说明读取，原样写入提示词。",
+        "typical_range": "1–3 个词",
+        "pitfalls": ["漏写触发词导致 LoRA 无效", "改写过触发词导致特征偏移"]
+      }
+    },
+    "ip_adapter_weight": {
+      "name": "ip_adapter_weight", "label": "IP-Adapter 权重", "type": "number", "default": 0.6,
+      "range": [0, 1.5], "unit": null,
+      "platform_map": { "ComfyUI": "IPAdapter weight", "即梦": "参考强度(近似)", "可灵": "待补", "豆包": "待补" },
+      "semantics": {
+        "what": "参考图特征注入强度（内容/风格通用）。",
+        "effect": "把参考图的语义特征（角色/画风）注入生成，比提示词强。",
+        "direction": "内容 0.7–0.9，风格 0.5–0.7；做微调 0.3。",
+        "typical_range": "0.3–0.9",
+        "pitfalls": ["权重过高构图被参考图绑架", "与 LoRA 同时使用需降档防冲突"]
+      }
+    }
+  },
+  "$defs": {
+    "param_def": {
+      "type": "object",
+      "description": "原子参数定义模板（registry 中每个条目的形状）",
+      "required": ["name", "label", "type", "default", "semantics"],
+      "properties": {
+        "name": { "type": "string" },
+        "label": { "type": "string" },
+        "type": { "enum": ["string", "number", "integer", "boolean", "array", "object", "null"] },
+        "default": {},
+        "range": { "description": "两元素数组 [min,max] 或字符串枚举或 null" },
+        "unit": { "type": ["string", "null"] },
+        "platform_map": { "type": "object", "additionalProperties": { "type": "string" } },
+        "semantics": {
+          "type": "object",
+          "required": ["what", "effect", "direction", "typical_range", "pitfalls"],
+          "properties": {
+            "what": { "type": "string" },
+            "effect": { "type": "string" },
+            "direction": { "type": "string" },
+            "typical_range": { "type": "string" },
+            "pitfalls": { "type": "array", "items": { "type": "string" } }
+          }
+        }
+      }
+    },
+    "filled_param": {
+      "type": "object",
+      "description": "翻译器产出的已填充参数项（出现在调参方案 params 数组中）",
+      "required": ["param", "value", "reason", "confidence"],
+      "properties": {
+        "param": { "type": "string", "description": "对应 registry 中的参数名" },
+        "value": { "description": "填写的值（须满足对应注册表条目的范围/类型）" },
+        "default": { "description": "该参数默认值（解释改动量用）" },
+        "reason": { "type": "string", "description": "调整理由（绑定需求）" },
+        "confidence": { "enum": ["high", "medium", "low"] },
+        "source": { "type": "string", "description": "预设/需求/平台文档/语义库/用户素材/待确认" },
+        "platform_value": { "description": "映射到目标平台后的实际取值" }
+      }
+    }
+  }
+}

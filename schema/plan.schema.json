@@ -1,0 +1,125 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/TEXXXXTURE/aigc-param-translator/schema/plan.schema.json",
+  "title": "调参方案 Schema（唯一中间产物）",
+  "description": "翻译器产出的唯一中间产物结构。A/B/C 三分支共用；解释器、执行层、校验器都以它为输入。每项改动必须携带调整理由。",
+  "type": "object",
+  "required": ["meta", "params", "explain"],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["requirement", "platform", "mode"],
+      "properties": {
+        "requirement": { "type": "string", "description": "用户需求原文" },
+        "platform": {
+          "type": "string",
+          "description": "目标平台",
+          "enum": ["ComfyUI", "即梦", "可灵", "豆包", "SD WebUI", "LiblibAI", "其他"]
+        },
+        "mode": { "enum": ["quick", "full"], "description": "输出档位：quick=快档（照抄参数表+最短指引），full=全档（完整说明书）" },
+        "preset_hit": { "type": ["string", "null"], "description": "命中的预设卡编号，如 02-cyberpunk-poster；null=未命中" },
+        "preset_note": { "type": "string", "description": "预设命中/未命中说明与覆盖项" },
+        "created_at": { "type": "string", "description": "生成时间 ISO8601" },
+        "revision": { "type": "integer", "description": "方案版本号，迭代 +1" }
+      }
+    },
+    "preset": {
+      "type": ["object", "null"],
+      "description": "命中的预设模板与覆盖声明",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "overrides": {
+          "type": "array",
+          "description": "用户需求对预设档位的覆盖项",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "params": {
+      "type": "array",
+      "description": "原子参数清单，每项带调整理由",
+      "items": { "$ref": "#/$defs/filled_param" }
+    },
+    "assets": {
+      "type": "array",
+      "description": "引用的资产（参考图/LoRA/ControlNet 条件图/风格权重）",
+      "items": { "$ref": "#/$defs/asset_ref" }
+    },
+    "explain": {
+      "type": "array",
+      "description": "面向使用者的解释条目（四件套）",
+      "items": { "$ref": "#/$defs/explain_entry" }
+    },
+    "exec": {
+      "type": "object",
+      "description": "执行分支建议（路由规则写死，此处只做记录）",
+      "required": ["branch", "reason"],
+      "properties": {
+        "branch": { "enum": ["A", "B", "C"] },
+        "reason": { "type": "string" },
+        "steps": {
+          "type": "array",
+          "description": "执行步骤（B 为 GUI 操作序列，C 为人工指引步骤）",
+          "items": { "type": "string" }
+        },
+        "fallback": { "enum": ["B", "C", null], "description": "失败回退分支" }
+      }
+    },
+    "risk": {
+      "type": "array",
+      "description": "风险与缓解",
+      "items": {
+        "type": "object",
+        "required": ["param", "risk", "mitigation"],
+        "properties": {
+          "param": { "type": "string" },
+          "risk": { "type": "string" },
+          "mitigation": { "type": "string" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "filled_param": {
+      "type": "object",
+      "required": ["param", "value", "reason", "confidence"],
+      "properties": {
+        "param": { "type": "string", "description": "对应 params.schema.json registry 中的参数名" },
+        "value": { "description": "填写的值" },
+        "default": { "description": "默认值（解释改动量）" },
+        "reason": { "type": "string", "description": "调整理由（绑定需求）" },
+        "confidence": { "enum": ["high", "medium", "low"] },
+        "source": { "type": "string", "description": "预设/需求/平台文档/语义库/用户素材/待确认" },
+        "platform_value": { "description": "映射到目标平台后的实际取值" }
+      }
+    },
+    "asset_ref": {
+      "type": "object",
+      "required": ["asset_id", "type", "slot", "reason"],
+      "properties": {
+        "asset_id": { "type": "string", "description": "资产库中的资产标识" },
+        "type": { "enum": ["角色", "场景", "材质", "风格", "环境", "物体", "自定义"] },
+        "slot": {
+          "type": "string",
+          "description": "该资产进入哪个参数槽位",
+          "enum": ["reference_images", "ref_type", "lora", "controlnet", "style_weight", "其他"]
+        },
+        "reason": { "type": "string", "description": "为什么引用这个资产" },
+        "confidence": { "enum": ["high", "medium", "low"] }
+      }
+    },
+    "explain_entry": {
+      "type": "object",
+      "required": ["param", "what", "why", "expect", "risk"],
+      "properties": {
+        "param": { "type": "string" },
+        "what": { "type": "string", "description": "是什么参数" },
+        "why": { "type": "string", "description": "为什么这样调（绑定本方案的具体值）" },
+        "expect": { "type": "string", "description": "预期效果" },
+        "risk": { "type": "string", "description": "风险与观察点" },
+        "mode": { "enum": ["quick", "full"], "description": "该条目属于快档还是全档解释" }
+      }
+    }
+  }
+}
