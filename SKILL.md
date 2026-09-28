@@ -75,9 +75,13 @@ description: >-
 
 `tools/verifier.md` 定义出图校验维度与案例条目格式；成功 / 失败案例回流更新预设库与语义库。
 
-## 6. 资产层
+## 6. 资产库模块（library）
 
-`knowledge/assets.md` 定义资产 Schema、插件接口（extract_asset / segment / train_lora / search_asset，背后接成熟实现）、以及资产与调参方案的联动规则（方案生成时自动检索引用资产并解释为什么用）。
+- **主协议**：`library/LIBRARY.md` —— 把灵感与积累（图片 / 视频 / 文本 / 概念 / 故事 / 背景·世界观 / 人设 / 服饰 / 角色设计 / 风格 / 镜头 / 场景 / 材质 / 提示词 / 案例）沉淀为个人资产；**文件夹即资产单元**，采集 → 结构化 → 门禁 → 索引 → 消费；品类按生成步骤组织（单人剧组视角），展示层对接工作台看板与一键展示站。
+- **资产 Schema**：`library/asset.schema.json`（介质轴 media × 品类轴 kind，frontmatter 定义）。
+- **插件接口契约**：`knowledge/assets.md`（extract_asset / segment / split_layers / train_lora / search_asset，背后接成熟实现）——资产库不重做拆解，只做组织、语义化、检索、消费与展示。
+- **一键展示站**：`library/sitegen.md`（输入资产库根 → 静态画廊站；与工作台看板共用 `library.json`）。
+- **与调参方案联动**：方案生成时按需求检索资产（角色 / 人设 / 世界观 / 风格…），命中写入 `plan.assets[]` 并解释为什么用；文本类资产注入 prompt_text / story_context / character_card 槽位。
 
 ## 7. 保真护栏（shared/safeguards.md，全流程生效）
 
@@ -103,12 +107,18 @@ aigc-param-translator/
 ├── knowledge/
 │   ├── params.md         ★ 参数语义库（解释器底座）
 │   ├── exec-branches.md    执行层三分支路由与指引规范
-│   └── assets.md           资产层：Schema + 插件接口 + 方案联动
+│   └── assets.md           插件接口契约（抠图/拆层/LoRA/搜索，背后接现成实现）
+├── library/
+│   ├── LIBRARY.md          ★ 资产库主协议（folder-as-asset + 采集入库工作流 + 消费与展示）
+│   ├── asset.schema.json   资产主档 Schema（media × kind 双轴）
+│   ├── sitegen.md          一键展示站生成器契约（对接工作台看板）
+│   └── example/            示例资产（仅验证 schema，非真实素材）
 ├── tools/
 │   ├── translator.md      翻译器工作流（路由 → 槽位 → 校验）
 │   ├── explainer.md       解释器工作流（四件套 + 两档）
 │   ├── planner.md         快档 / 全档输出规范
-│   └── verifier.md        出图校验 + 案例沉淀
+│   ├── verifier.md        出图校验 + 案例沉淀
+│   └── bin/              ★ ptr CLI（TS：入库/门禁/索引/检索/展示站）
 ├── shared/
 │   ├── safeguards.md      通用保真护栏
 │   └── glossary.md        术语对照（原子参数 ↔ 平台字段）

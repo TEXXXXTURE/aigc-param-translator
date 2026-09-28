@@ -1,0 +1,69 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/TEXXXXTURE/aigc-param-translator/library/asset.schema.json",
+  "title": "资产主档 Schema（asset.md frontmatter）",
+  "description": "资产库模块的资产主档字段定义。一个资产 = 一个文件夹（asset.md + media/ + variants/ + notes/）；本 Schema 约束 asset.md 的 frontmatter。介质轴 media × 品类轴 kind 双轴定类。",
+  "type": "object",
+  "required": ["id", "kind", "media", "name", "created_at", "created_from", "source", "semantics", "version"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^(character|persona|chardesign|costume|scene|worldview|style|shot|concept|story|material|object|environment|prompt|case|custom)\\.[a-z0-9_]+$",
+      "description": "资产唯一标识：<kind>.<name>，小写点分，name 内单词用下划线。文件夹名 = id。"
+    },
+    "kind": {
+      "type": "string",
+      "description": "品类轴（内容语义）。shot=镜头·摄影风格（焦段/构图/机位/运镜，对应传统镜头编号预设）；costume=人设服饰参考。",
+      "enum": ["character", "persona", "chardesign", "costume", "scene", "worldview", "style", "shot", "concept", "story", "material", "object", "environment", "prompt", "case", "custom"]
+    },
+    "media": {
+      "type": "string",
+      "description": "介质轴（载体形式）",
+      "enum": ["image", "video", "text", "audio", "mixed"]
+    },
+    "name": { "type": "string", "description": "资产名（用户可读，中文可用）" },
+    "created_at": { "type": "string", "format": "date", "description": "创建日期 ISO8601" },
+    "created_from": {
+      "type": "string",
+      "enum": ["manual", "capture", "generation", "training", "import"],
+      "description": "来源方式：manual=手动记录；capture=采集自外部；generation=自产出图/内容；training=训练产物（如 LoRA）；import=导入迁移"
+    },
+    "source": {
+      "type": "object",
+      "required": ["origin"],
+      "properties": {
+        "origin": { "type": "string", "description": "来源：作品名 / URL / 自产出图 / 灵感笔记" },
+        "url": { "type": "string", "description": "原始链接（可选）" },
+        "license_note": { "type": "string", "description": "版权备注：仅供个人学习 / 可商用 / 待替换等" }
+      }
+    },
+    "stars": { "type": "integer", "minimum": 0, "maximum": 5, "default": 0, "description": "星标 0–5：高价值资产标记" },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "用户标签，≥1 个以保证可检索"
+    },
+    "semantics": {
+      "type": "object",
+      "required": ["what", "suitable_for"],
+      "properties": {
+        "what": { "type": "string", "description": "这个资产是什么（一句话，检索与展示用）" },
+        "suitable_for": {
+          "type": "array",
+          "description": "可进入的调参方案槽位",
+          "items": {
+            "type": "string",
+            "enum": ["reference_images", "ref_type", "lora", "controlnet", "style_weight", "prompt_text", "story_context", "character_card"]
+          }
+        },
+        "restrictions": { "type": "string", "description": "限制：底模兼容、使用前提、版权归属" }
+      }
+    },
+    "consumed_in": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "被哪些调参方案消费过（plan id 列表，进化回路写入）"
+    },
+    "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$", "description": "SemVer；内容迭代 +1，id 不变" }
+  }
+}

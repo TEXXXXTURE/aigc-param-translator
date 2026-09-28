@@ -43,7 +43,7 @@
     },
     "assets": {
       "type": "array",
-      "description": "引用的资产（参考图/LoRA/ControlNet 条件图/风格权重）",
+      "description": "引用的资产（来自资产库 library，与 LIBRARY.md / asset.schema.json 对齐；参考图/LoRA/ControlNet 条件图/风格权重/文本类上下文）",
       "items": { "$ref": "#/$defs/asset_ref" }
     },
     "explain": {
@@ -98,12 +98,16 @@
       "type": "object",
       "required": ["asset_id", "type", "slot", "reason"],
       "properties": {
-        "asset_id": { "type": "string", "description": "资产库中的资产标识" },
-        "type": { "enum": ["角色", "场景", "材质", "风格", "环境", "物体", "自定义"] },
+        "asset_id": { "type": "string", "description": "资产库中的资产标识（<kind>.<name>）" },
+        "type": {
+          "type": "string",
+          "description": "资产品类（与 library/asset.schema.json 的 kind 对齐）",
+          "enum": ["character", "persona", "chardesign", "costume", "scene", "worldview", "style", "shot", "concept", "story", "material", "object", "environment", "prompt", "case", "custom"]
+        },
         "slot": {
           "type": "string",
-          "description": "该资产进入哪个参数槽位",
-          "enum": ["reference_images", "ref_type", "lora", "controlnet", "style_weight", "其他"]
+          "description": "该资产进入哪个参数/上下文槽位",
+          "enum": ["reference_images", "ref_type", "lora", "controlnet", "style_weight", "prompt_text", "story_context", "character_card", "其他"]
         },
         "reason": { "type": "string", "description": "为什么引用这个资产" },
         "confidence": { "enum": ["high", "medium", "low"] }
