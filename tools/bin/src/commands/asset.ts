@@ -19,7 +19,7 @@ export async function runAsset(root: string, args: Args): Promise<void> {
 
 async function add(root: string, args: Args): Promise<void> {
   const src = args._[1];
-  if (!src) throw new Error("用法：ptr asset add <本地文件|URL|文本> --kind <k> [--name n] [--media m] [--tags a,b] [--from manual|capture]");
+  if (!src) throw new Error("用法：ptr asset add <本地文件|URL|文本> --kind <k> [--name n] [--slug s] [--media m] [--tags a,b] [--from manual|capture]");
   const kind = typeof args.kind === "string" ? args.kind : "";
   if (!KINDS.includes(kind as never)) throw new Error(`--kind 必填且需在枚举内：${KINDS.join("/")}`);
 
@@ -34,32 +34,40 @@ async function add(root: string, args: Args): Promise<void> {
   }
 
   const media = typeof args.media === "string" ? args.media : isFile ? mediaTypeOf(src) : isUrl ? "mixed" : "text";
-  const slug = slugify(name) || "asset_" + Date.now();
+  // id 的 name 段只允许 [a-z0-9_]（见 asset.schema.json pattern）；中文名走 --slug 显式指定，否则自动剥成 ASCII
+  const slug = slugify(typeof args.slug === "string" ? args.slug : name) || `${kind}_${Date.now()}`;
   const id = `${kind}.${slug}`;
   const dir = path.join(root, "_pending", id);
   ensureDir(dir);
   ensureDir(path.join(dir, "media"));
 
   let copied: string | null = null;
+  let realMedia: string | null = null;
   if (isFile) {
     const target = path.join(dir, "media", path.basename(src));
     await copyFile(src, target);
     copied = path.basename(src);
+    realMedia = mediaTypeOf(target);
   } else if (isUrl) {
-    const fname = slugify(name) + guessExtFromUrl(src);
-    await download(src, path.join(dir, "media", fname));
+    const fname = slug + guessExtFromUrl(src);
+    const target = path.join(dir, "media", fname);
+    await download(src, target);
     copied = fname;
+    realMedia = mediaTypeOf(target);
   } else {
     fs.writeFileSync(path.join(dir, "media", "idea.txt"), src, "utf8");
     copied = "idea.txt";
+    realMedia = "text";
   }
+  // 落盘后按真实文件类型修正 media（URL 常带不可靠扩展名/未知类型）
+  const mediaFinal = realMedia ?? media;
 
   const tags = typeof args.tags === "string" ? args.tags.split(",").map((t) => t.trim()).filter(Boolean) : [];
   const created_from = typeof args.from === "string" ? args.from : isUrl ? "capture" : isFile ? "capture" : "manual";
   const meta: AssetMeta = {
     id,
     kind,
-    media,
+    media: mediaFinal,
     name,
     created_at: today(),
     created_from,

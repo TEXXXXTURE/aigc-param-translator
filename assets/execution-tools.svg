@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="300" viewBox="0 0 860 300" font-family="system-ui, sans-serif">
+  <rect width="860" height="300" rx="12" fill="#f6f8fa"/>
+  <text x="30" y="36" font-size="16" font-weight="700" fill="#0f766e">执行层 · 三型工具 × 三分支（A API 直连 / B 读屏操控 / C 人工指引）</text>
+
+  <!-- ComfyUI -->
+  <g>
+    <rect x="28" y="56" width="252" height="212" rx="10" fill="#fff" stroke="#10b981" stroke-width="1.5"/>
+    <text x="48" y="84" font-size="14" font-weight="700" fill="#1f2937">ComfyUI 类 · 原子化</text>
+    <text x="48" y="104" font-size="12" fill="#4b5563">本地节点 / MCP，Agent 可操作</text>
+    <line x1="48" y1="116" x2="258" y2="116" stroke="#e5e7eb"/>
+    <text x="48" y="138" font-size="12" fill="#374151">参数：seed / steps / cfg /</text>
+    <text x="48" y="154" font-size="12" fill="#374151">sampler / denoise … 逐个可控</text>
+    <text x="48" y="180" font-size="12" font-weight="700" fill="#047857">执行：A 直连 / B 读屏</text>
+    <text x="48" y="202" font-size="12" fill="#6b7280">自由度：高（可精确翻译）</text>
+    <text x="48" y="230" font-size="12" fill="#9ca3af">代表：ComfyUI / SD 系</text>
+    <text x="48" y="250" font-size="12" fill="#9ca3af">（API 或 MCP 优先）</text>
+  </g>
+
+  <!-- 预设式平台 -->
+  <g>
+    <rect x="304" y="56" width="252" height="212" rx="10" fill="#fff" stroke="#3b82f6" stroke-width="1.5"/>
+    <text x="324" y="84" font-size="14" font-weight="700" fill="#1f2937">预设式平台 · 不自由</text>
+    <text x="324" y="104" font-size="12" fill="#4b5563">国内厂商网页端，模型+LoRA+预设</text>
+    <line x1="324" y1="116" x2="534" y2="116" stroke="#e5e7eb"/>
+    <text x="324" y="138" font-size="12" fill="#374151">参数：模型 / LoRA / 预设档位</text>
+    <text x="324" y="154" font-size="12" fill="#374151">受平台限制，可调项少</text>
+    <text x="324" y="180" font-size="12" font-weight="700" fill="#1e40af">执行：C 人工指引 / B 读屏</text>
+    <text x="324" y="202" font-size="12" fill="#6b7280">自由度：低（翻译到平台字段）</text>
+    <text x="324" y="230" font-size="12" fill="#9ca3af">代表：即梦 / 可灵 / LiblibAI</text>
+    <text x="324" y="250" font-size="12" fill="#9ca3af">（字段映射 + 指引为主）</text>
+  </g>
+
+  <!-- Midjourney -->
+  <g>
+    <rect x="580" y="56" width="252" height="212" rx="10" fill="#fff" stroke="#a855f7" stroke-width="1.5"/>
+    <text x="600" y="84" font-size="14" font-weight="700" fill="#1f2937">Midjourney 类 · 指标参数</text>
+    <text x="600" y="104" font-size="12" fill="#4b5563">命令 + 指标参数，语法另类</text>
+    <line x1="600" y1="116" x2="810" y2="116" stroke="#e5e7eb"/>
+    <text x="600" y="138" font-size="12" fill="#374151">参数：--ar / --stylize / --chaos</text>
+    <text x="600" y="154" font-size="12" fill="#374151">--no / --iw / --s … 指标化</text>
+    <text x="600" y="180" font-size="12" font-weight="700" fill="#7e22ce">执行：C 语法指引 / A API</text>
+    <text x="600" y="202" font-size="12" fill="#6b7280">自由度：中（命令内可调）</text>
+    <text x="600" y="230" font-size="12" fill="#9ca3af">代表：Midjourney / Niji</text>
+    <text x="600" y="250" font-size="12" fill="#9ca3af">（斜杠命令语法翻译）</text>
+  </g>
+</svg>

@@ -87,7 +87,7 @@ cd tools/bin && npm install && npm run build
 
 # 使用（Windows: tools/bin/ptr.cmd；Linux/macOS: tools/bin/ptr）
 ptr init --root <资产库根>                        # 初始化骨架：00-index.md / library.json / _pending/
-ptr asset add <本地文件|URL|文本> --kind <k> [--name n] [--media m] [--tags a,b]   # 采集 → _pending 草稿
+ptr asset add <本地文件|URL|文本> --kind <k> [--name n] [--slug s] [--media m] [--tags a,b]   # 采集 → _pending 草稿
 ptr asset ls --root <根>                          # 列出资产（含 _pending）
 ptr asset approve <id> --root <根>                # 过门禁（校验通过才移入正式目录）
 ptr validate [资产目录|asset.md] --root <根>       # 门禁校验（有问题退出码 1）
@@ -98,6 +98,7 @@ ptr sitegen --root <根> [--out 目录]               # 一键生成静态展示
 
 - 根目录解析：`--root` 参数 > 环境变量 `AIGC_LIBRARY_ROOT` > `./assets-library`
 - 品类枚举：character / persona / chardesign / costume / scene / worldview / style / shot / concept / story / material / object / environment / prompt / case / custom
+- **中文名注意**：资产 id 只允许 ASCII（`<kind>.<name>`，name 为 a-z0-9_），中文显示名用 `--name` 指定、`--slug` 给英文 id；Windows 控制台向 node 传中文路径/名称有编码风险，建议路径用 ASCII、中文内容在 asset.md 内编辑
 - 源码与协议说明见 `tools/bin/`（`ptr --help` 看全部用法）
 
 ---
@@ -132,7 +133,7 @@ aigc-param-translator/
 ├── shared/
 │   ├── safeguards.md        通用保真护栏
 │   └── glossary.md          术语对照（原子参数 ↔ 平台字段）
-└── assets/                  banner.svg / architecture.svg
+└── assets/                  banner.svg / architecture.svg / execution-tools.svg
 ```
 
 ---
@@ -169,6 +170,20 @@ LLM 槽位填充（只填 schema 槽位，带理由与置信度）
   ↓
 交付（快档 / 全档）→ 出图校验 → 案例沉淀 → 更新预设库 / 语义库
 ```
+
+### 执行层 · 三型工具（A / B / C 分支对应）
+
+<p align="center">
+  <img src="assets/execution-tools.svg" alt="Execution Tools" width="100%">
+</p>
+
+| 工具类型 | 特征 | 参数方式 | 执行分支 | 自由度 |
+|---|---|---|---|---|
+| **ComfyUI 类**（原子化） | 本地节点 / MCP，Agent 可操作 | seed / steps / cfg / sampler… 逐个可控 | A 直连 · B 读屏 | 高 |
+| **预设式平台**（国内厂商） | 网页端预设 + 模型 + LoRA | 平台字段受限于预设档位 | C 人工指引 · B 读屏 | 低 |
+| **Midjourney 类**（指标参数） | 斜杠命令 + 指标参数 | `--ar` `--stylize` `--chaos` `--no` `--iw`… | C 语法指引 · A API | 中 |
+
+> 三分支共用同一份调参方案：方案只管"翻译成什么"，A/B/C 只解决"怎么执行"。
 
 ---
 
