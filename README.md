@@ -97,7 +97,7 @@ ptr sitegen --root <根> [--out 目录]               # 一键生成静态展示
 ```
 
 - 根目录解析：`--root` 参数 > 环境变量 `AIGC_LIBRARY_ROOT` > `./assets-library`
-- 品类枚举：character / persona / chardesign / costume / scene / worldview / style / shot / concept / story / material / object / environment / prompt / case / custom
+- 品类枚举：character / persona / chardesign / costume / scene / worldview / style / shot / concept / story / material / object / environment / prompt / case / style_anchor / camera_ref / custom
 - **中文名注意**：资产 id 只允许 ASCII（`<kind>.<name>`，name 为 a-z0-9_），中文显示名用 `--name` 指定、`--slug` 给英文 id；Windows 控制台向 node 传中文路径/名称有编码风险，建议路径用 ASCII、中文内容在 asset.md 内编辑
 - 源码与协议说明见 `tools/bin/`（`ptr --help` 看全部用法）
 
@@ -110,6 +110,7 @@ aigc-param-translator/
 ├── SKILL.md                 协议主文件：翻译循环 + 路由 + 解释 + 执行路由
 ├── PRD.md                   产品需求文档（架构决策全记录）
 ├── routes/
+│   ├── ideation.md          ★ 思路拆解 route（三循环分步引导，主入口，ADR-0001）
 │   ├── ROUTE.md             预设路由表（Agent 查表处）
 │   └── presets/             预设模板库（00 默认 + 01–06 场景）
 ├── schema/
@@ -148,6 +149,9 @@ aigc-param-translator/
 
 ```text
 自然语言需求
+  ↓
+思路拆解（三循环，routes/ideation.md）：
+  A 风格锚（定基调基准）→ B 构图（机位/画幅/比例）→ C 灯光（色温/光比/方向/软硬）
   ↓
 需求解析（平台 / 风格 / 主体 / 约束 / 档位）
   ↓
@@ -196,6 +200,7 @@ LLM 槽位填充（只填 schema 槽位，带理由与置信度）
 - [ ] M4：执行层三分支实跑（先 C 后 B/A）
 - [ ] M5：进化回路真实案例沉淀
 - [~] M6：资产库模块（library）—— 协议 + ptr CLI 已落盘（入库/门禁/索引/检索/展示站跑通演示）；待真实资产入库验证
+- [x] M7：思路拆解 route（三循环）按 ADR-0001 回写——`routes/ideation.md` 主入口 + 资产 kind 增 style_anchor / camera_ref + character_card 三面图门禁
 - [ ] 扩展：更多平台映射（即梦 / 可灵 / 豆包 API 字段）
 - [ ] 英文版 README
 
@@ -205,4 +210,4 @@ LLM 槽位填充（只填 schema 槽位，带理由与置信度）
 
 [MIT](./LICENSE) © 2026 TEXXXXTURE
 
-*把感觉翻译成参数，把参数解释成人话。*
+*把感觉拆成思路（风格锚 / 构图 / 灯光），把思路翻成参数与提示词，把参数解释成人话。*

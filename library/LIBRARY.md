@@ -24,14 +24,16 @@
 
 | kind | 中文 | 说明 | 典型消费槽位 |
 |---|---|---|---|
-| character | 角色 | 有视觉形象的角色（参考图 / 三视图 / LoRA） | reference_images / lora / character_card |
+| character | 角色 | 有视觉形象的角色（参考图 / 三视图 / LoRA）；**作 character_card 消费须三面图（正 / 侧 / 背）+ 多角度成组才入库**（ADR-0001） | reference_images / lora / character_card |
 | persona | 人设 | 人物设定（性格 / 背景 / 动机 / 口头禅），文字为主 | character_card / prompt_text / story_context |
 | chardesign | 角色设计 | 角色设计稿（概念稿 / 造型 / 配色 / 服装） | reference_images / style_weight |
 | costume | 服饰 | 人设服饰参考（同一角色多套服装 / 造型细节） | reference_images / character_card |
 | scene | 场景 | 环境场景图 / 空间设定 | reference_images / controlnet |
 | worldview | 背景·世界观 | 世界观 / 背景设定文档（时间线 / 势力 / 规则） | story_context / prompt_text |
 | style | 风格 | 画风 / 风格参考（光影 / 色调 / 质感） | style_weight / reference_images |
+| style_anchor | 风格锚基准图 | 三循环 A 循环产物：抽卡 / MJ 反复生图捞出的"对味"基准图，锁色调质感基调；**独立于 environment 存**（ADR-0001） | style_weight / style_anchor / reference_images |
 | shot | 镜头·摄影风格 | 镜头风格（焦段 / 构图 / 机位 / 运镜 / 景深），提示词或图文混合；对应传统影视"镜头编号预设" | prompt_text / controlnet / reference_images |
+| camera_ref | 机位 / 镜头参考 | 三循环 B 循环产物：机位预设静帧 / 白模 blockout 静帧 / 参考图，定构图与巨物感 | camera_ref / controlnet / reference_images |
 | concept | 概念 | 点子 / 创意 / 灵感片段（一句话或图文） | prompt_text / story_context |
 | story | 故事 | 剧情 / 故事梗概 / 分镜 / 桥段 | story_context / prompt_text |
 | material | 材质 | 材质参考（金属 / 布料 / 皮肤…） | reference_images / controlnet |
@@ -127,6 +129,7 @@ Agent 读取素材，提取 frontmatter 草稿（kind / media / name / what / ta
 - [ ] 有 `what`（一句话）和 ≥1 个 tag（可检索性）
 - [ ] 来源已登记（含版权备注）
 - [ ] 有至少一个 `suitable_for` 槽位（或显式标注"暂不消费"）
+- [ ] **以 character_card 槽位入库的角色类资产：三面图（正 / 侧 / 背）或多角度成组齐全**（ADR-0001；不足则留在 `_pending/` 注明缺面）
 → 通过 → 移入正式目录并建索引；未通过 → 留在 `_pending/` 并写明缺什么。
 
 ### 第 4 步 · 建索引 index
@@ -141,9 +144,10 @@ Agent 读取素材，提取 frontmatter 草稿（kind / media / name / what / ta
 
 原 `plan.schema.json` 的 `asset_ref.slot` 枚举扩展为：
 
-`reference_images` / `ref_type` / `lora` / `controlnet` / `style_weight` / `prompt_text` / `story_context` / `character_card`
+`reference_images` / `ref_type` / `lora` / `controlnet` / `style_weight` / `prompt_text` / `story_context` / `character_card` / `style_anchor` / `camera_ref`
 
 - 需求提"同一角色 / 同一产品 / 同一画风 / 沿用世界观 / 沿用这个人设"→ 必须检索对应资产；无命中时明确提示"建议先建资产"，并标注一致性风险。
+- 三循环引用：风格锚基准图 → `style_anchor` 槽位；机位 / 白模参考 → `camera_ref` 槽位（ADR-0001）。
 - 引用必须带 `reason`；资产归属登记在 `source`，引用不主张归属（护栏：只组织与引用）。
 
 ## 8. 展示层（工作台 + 一键展示站）

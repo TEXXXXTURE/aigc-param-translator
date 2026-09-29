@@ -102,12 +102,12 @@
         "type": {
           "type": "string",
           "description": "资产品类（与 library/asset.schema.json 的 kind 对齐）",
-          "enum": ["character", "persona", "chardesign", "costume", "scene", "worldview", "style", "shot", "concept", "story", "material", "object", "environment", "prompt", "case", "custom"]
+          "enum": ["character", "persona", "chardesign", "costume", "scene", "worldview", "style", "shot", "concept", "story", "material", "object", "environment", "prompt", "case", "style_anchor", "camera_ref", "custom"]
         },
         "slot": {
           "type": "string",
           "description": "该资产进入哪个参数/上下文槽位",
-          "enum": ["reference_images", "ref_type", "lora", "controlnet", "style_weight", "prompt_text", "story_context", "character_card", "其他"]
+          "enum": ["reference_images", "ref_type", "lora", "controlnet", "style_weight", "prompt_text", "story_context", "character_card", "style_anchor", "camera_ref", "其他"]
         },
         "reason": { "type": "string", "description": "为什么引用这个资产" },
         "confidence": { "enum": ["high", "medium", "low"] }

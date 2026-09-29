@@ -57,7 +57,7 @@ const HELP = `ptr —— AIGC 调参翻译器资产库 CLI（确定性操作）
   ptr sitegen [--root 目录] [--out 目录]       一键生成静态展示站（默认 <root>/_site）
 
 根目录解析：--root 参数 > 环境变量 AIGC_LIBRARY_ROOT > ./assets-library
-品类（kind）：character persona chardesign costume scene worldview style shot concept story material object environment prompt case custom
+品类（kind）：character persona chardesign costume scene worldview style style_anchor shot camera_ref concept story material object environment prompt case custom
 `;
 
 export async function main(): Promise<void> {

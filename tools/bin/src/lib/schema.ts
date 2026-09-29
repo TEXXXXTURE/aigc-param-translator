@@ -7,7 +7,9 @@ export const KINDS = [
   "scene",
   "worldview",
   "style",
+  "style_anchor",
   "shot",
+  "camera_ref",
   "concept",
   "story",
   "material",
@@ -31,6 +33,8 @@ export const SLOTS = [
   "prompt_text",
   "story_context",
   "character_card",
+  "style_anchor",
+  "camera_ref",
 ] as const;
 
 export const KIND_PATTERN = new RegExp(
