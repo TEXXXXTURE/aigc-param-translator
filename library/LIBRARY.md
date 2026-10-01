@@ -119,6 +119,12 @@ version: 0.1.0
 输入可为：URL（网页 / 视频页 / 图片链接）、本地文件、随手文本、出图结果、案例。
 → 文件落 `media/`；纯文本概念直接进正文；来源一并记录。
 
+**输入形态识别（2026-10-02 新增，依据噪力GrainForce 图文帖实测）：**
+- 视频抽帧 → 单帧环境 / 场景资产（既有路径）。
+- 图文帖 / 资产卡（多视角成组、摆图、组件拆解）→ 先识别结构：**多视角成组**（同一主体多角度拼接）→ 整卡入库（多文件进一个 `media/`，如 `scene.ruined_tree_city` 4 图成组）或拆卡入库（单体分别建档）；**组件拆解 / 分镜板** → kind=shot。
+- 多视角成组的 character 类：**直接满足 character_card 三面图门禁**（正 / 侧 / 背或多角度成组齐全），无需再补图。
+- 空白底 / 纯色底单体多角度图：优先归 character / chardesign / costume / object / material，是 reference_images / LoRA 训练的理想素材。
+
 ### 第 2 步 · 结构化 structure
 Agent 读取素材，提取 frontmatter 草稿（kind / media / name / what / tags / suitable_for / source），**交给用户确认后再落盘**（沿用"只填槽不发挥"）。
 无法确定的字段标"待确认"，不编造。
