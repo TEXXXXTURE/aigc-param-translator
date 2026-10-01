@@ -1,0 +1,46 @@
+# 灵感源精选目录 registry.yaml（v0.1）
+# 内置层：随 skill 仓分发，只读；个人收藏 / 修正请写用户层 <aigc-library>/sources/user-sources.yaml
+# 条目 schema 见 SOURCES.md §3；status: active=已收录（可被检索推荐）
+sources:
+  - id: source.yeguozi
+    name: 野果子 Yeguozi
+    purpose: 电影配色 / 空间 / 家居 / 摄影美学帧级参考（色彩、光影、构图）
+    url: https://www.yeguozi.com/
+    kind_targets: [environment, style_anchor, style, scene, shot, material, object]
+    access: open
+    harvest: manual
+    license: 电影剧照版权归片方 / 作者，仅供个人学习与灵感参考，商用需另行授权
+    search_hint: 四条浏览线——色彩美学（红/绿/蓝）、空间美学（客厅/卧室/厨房）、家居美学（灯具/沙发/书架）、摄影美学（框中框/窗边光/暖色光影）；每部电影有剧照集 + 帧记解读；导演页按色调气质筛选
+    stars: 4
+    tags: [电影, 配色, 色彩美学, 空间, 光影, 构图, 帧参考]
+    last_checked: 2026-10-02
+    status: active
+
+  - id: source.mokeaigc
+    name: MOKE AIGC
+    purpose: AIGC 技术与资讯、提示词库、Skill 工作流、视频教程（中文知识站）
+    url: https://www.mokeaigc.com/
+    kind_targets: [prompt, case, concept, style]
+    access: login          # 首页免登录，部分内容需登录——待确认
+    harvest: manual
+    license: 站内内容归 MOKE 所有，个人学习参考；提示词库可抄写复用（商用边界待确认）
+    search_hint: 导航五块——技术与资讯 / Skill / 提示词库 / 流程规范 / 视频教程；提示词库与流程规范是文本资产主来源
+    stars: 4
+    tags: [AIGC资讯, 提示词, 工作流, 教程, 中文]
+    last_checked: 2026-10-02
+    status: active
+
+  - id: source.grainforce
+    name: 噪力GrainForce（抖音）
+    purpose: 概念视觉 / AI 流程作品：末日·巨物·赛博场景多视角参考与组件拆解卡
+    url: https://v.douyin.com/6-tQp1rxxG4/
+    kind_targets: [scene, environment, shot, style_anchor, object]
+    access: login
+    harvest: manual
+    license: 作者声明内容由 AI 生成；个人学习参考，商用需联系作者授权
+    search_hint: 图文帖多为场景多视角拼接卡 + 组件拆解/分镜板；取图需登录态（浏览器取图已实测可行）；主页 sec_uid 待补
+    stars: 4
+    tags: [抖音, 概念视觉, 3D, 场景, 分镜, 多视角]
+    last_checked: 2026-10-02
+    status: active
+
