@@ -32,16 +32,29 @@
       }
     },
     "sampler": {
-      "name": "sampler", "label": "采样器", "type": "string", "default": "DPM++ 2M Karras",
-      "range": ["Euler a", "Euler", "DPM++ 2M", "DPM++ 2M Karras", "DPM++ SDE Karras", "DDIM", "平台默认"],
+      "name": "sampler", "label": "采样器", "type": "string", "default": "DPM++ 2M",
+      "range": ["Euler a", "Euler", "DPM++ 2M", "DPM++ SDE", "DDIM", "平台默认"],
       "unit": null,
-      "platform_map": { "ComfyUI": "sampler_name / scheduler", "即梦": "待补", "可灵": "待补", "豆包": "待补" },
+      "platform_map": { "ComfyUI": "sampler_name", "SD WebUI": "Sampling method（注意 UI 串名内嵌 scheduler，如 DPM++ 2M Karras）", "即梦": "待补", "可灵": "待补", "豆包": "待补" },
       "semantics": {
         "what": "扩散去噪的数值求解器，决定每步如何从噪声走向图像。",
         "effect": "收敛速度、细节锐利度、随机纹理风格。",
-        "direction": "通用求稳 DPM++ 2M Karras；要锐利细节 DPM++ SDE（更慢）；动漫 Euler a 顺手。",
-        "typical_range": "上述枚举；无对应项用平台默认",
-        "pitfalls": ["采样器与调度器不匹配报错", "换采样器后效果大变却不改步数"]
+        "direction": "通用求稳 DPM++ 2M；要锐利细节 DPM++ SDE（更慢）；动漫 Euler a 顺手。",
+        "typical_range": "上述枚举（不含 scheduler 后缀，A1111 的 'DPM++ 2M Karras' 是 sampler+scheduler 串名，见 scheduler 条目）；无对应项用平台默认",
+        "pitfalls": ["换采样器后效果大变却不改步数", "把 UI 串名（DPM++ 2M Karras）当单一采样器名——ComfyUI 里 sampler 与 scheduler 是两个独立下拉"]
+      }
+    },
+    "scheduler": {
+      "name": "scheduler", "label": "调度器", "type": "string", "default": "normal",
+      "range": ["normal", "karras", "exponential", "sgm_uniform", "ddim_uniform", "平台默认"],
+      "unit": null,
+      "platform_map": { "ComfyUI": "scheduler", "SD WebUI": "内嵌于 Sampling method 串名（如 DPM++ 2M Karras 的 Karras 部分）", "即梦": "待补", "可灵": "待补", "豆包": "待补" },
+      "semantics": {
+        "what": "步数调度曲线（噪声衰减节奏），与采样器解耦的独立参数。",
+        "effect": "决定收敛节奏与纹理风格；同采样器配不同调度器效果有别。",
+        "direction": "通用 normal / karras；快速收敛 exponential；SGM 系模型用 sgm_uniform。",
+        "typical_range": "normal / karras / exponential / sgm_uniform / ddim_uniform",
+        "pitfalls": ["采样器与调度器不匹配报错", "A1111 的 'DPM++ 2M Karras' 是 UI 串名，翻译时须拆为 sampler=DPM++ 2M + scheduler=Karras"]
       }
     },
     "steps": {
@@ -57,15 +70,27 @@
       }
     },
     "cfg": {
-      "name": "cfg", "label": "CFG 引导强度", "type": "number", "default": 7,
-      "range": [1, 30], "unit": null,
+      "name": "cfg", "label": "CFG 引导强度", "type": "number", "default": null,
+      "range": [0, 30], "unit": null,
       "platform_map": { "ComfyUI": "cfg", "即梦": "提示词强度(近似)", "可灵": "待补", "豆包": "待补" },
       "semantics": {
         "what": "模型遵循提示词的强度。",
         "effect": "越高越贴提示词；过高过饱和/生硬，过低主体散架。",
-        "direction": "写实 5–6.5，风格化 7–9；结果散提 CFG，过饱和/塑料感降 CFG。",
-        "typical_range": "4–12；>15 视为异常需复核",
-        "pitfalls": [">12 色彩过饱和轮廓生硬", "<3 主体散架", "白底产品图过高出塑料感"]
+        "direction": "按基座分档（见 knowledge/params.md 分档表）：FLUX 系 2.5–3.5（蒸馏版 CFG=1）；SD1.5 7–12；SDXL 4–7；Seedream/即梦/可灵为平台封装不暴露裸 CFG。",
+        "typical_range": "按基座分档，不可跨基座套用",
+        "pitfalls": ["FLUX 套用 SD1.5 的 7–12 直接过饱和/崩坏", "蒸馏快模式（turbo/lightning/lcm）CFG 语义整体改变，常固定为 1", ">12 色彩过饱和轮廓生硬（SD1.5 语境）", "<3 主体散架", "白底产品图过高出塑料感"]
+      }
+    },
+    "model_version": {
+      "name": "model_version", "label": "模型版本快照", "type": "string", "default": null,
+      "range": null, "unit": null,
+      "platform_map": { "ComfyUI": "checkpoint 文件名/版本", "豆包": "model 参数（如 doubao-seedream-4-5-251128）", "即梦": "待补", "可灵": "待补" },
+      "semantics": {
+        "what": "模型的具体版本快照（如 doubao-seedream-4-5-251128），独立于 base_model 基座。",
+        "effect": "版本直接决定默认值：步数 / CFG 档 / 分辨率桶；跨版本不可随意套用参数。",
+        "direction": "翻译时锁定具体版本快照，默认值从该版本文档读取；拿不准用平台最新稳定版。",
+        "typical_range": "按平台可用版本列表",
+        "pitfalls": ["把版本塞进 base_model 导致默认值错乱", "旧版本参数套新版本可能已失效（蒸馏/快模式改变 CFG 与步数语义）"]
       }
     },
     "seed": {
@@ -126,7 +151,20 @@
         "effect": "决定构图骨架：海报竖版、世界观横版、社媒 4:5。",
         "direction": "按载体与用途定；系列图固定一个比例。",
         "typical_range": "上述枚举",
-        "pitfalls": ["海报用 1:1 导致构图平庸", "纵横比与像素值矛盾（如 16:9 配 1024×1024）"]
+        "pitfalls": ["海报用 1:1 导致构图平庸", "纵横比与像素值矛盾（如 16:9 配 1024×1024）", "枚举桶平台优先用 size_bucket（桶已隐含比例）"]
+      }
+    },
+    "size_bucket": {
+      "name": "size_bucket", "label": "分辨率桶", "type": "string", "default": null,
+      "range": ["1024x1024", "1664x928", "1216x832", "1344x768", "896x1152", "768x1344", "832x1216", "1536x640", "640x1536", "平台预设"],
+      "unit": null,
+      "platform_map": { "豆包": "尺寸预设档", "即梦": "尺寸选择（预设档）", "可灵": "尺寸选择", "ComfyUI": "自由像素（非桶）" },
+      "semantics": {
+        "what": "平台预定义的画布尺寸档（Qwen/混元/Seedream 均为枚举桶，非自由像素）。",
+        "effect": "决定构图比例与细节量；在枚举桶平台填自由像素会被吸附或报错。",
+        "direction": "优先选平台预设桶；ComfyUI 类才用自由像素 width/height。",
+        "typical_range": "按平台预设档选择",
+        "pitfalls": ["自由像素在枚举桶平台被吸附变形", "size_bucket 与 aspect_ratio 矛盾（桶已隐含比例）"]
       }
     },
     "hires_fix": {

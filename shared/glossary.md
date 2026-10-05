@@ -6,13 +6,16 @@
 
 | 原子参数 | ComfyUI | SD WebUI | 即梦 | 可灵 | 豆包 API（Seedream） |
 |---|---|---|---|---|---|
-| base_model | checkpoint / base model | Stable Diffusion checkpoint | 平台默认/风格模型 | 平台默认 | 模型版本参数 |
-| sampler | sampler_name (+scheduler) | Sampling method | 待补 | 待补 | 待补 |
+| base_model | checkpoint / base model | Stable Diffusion checkpoint | 平台默认/风格模型 | 平台默认 | 模型版本参数（含版本快照） |
+| model_version | checkpoint 文件名/版本 | 模型版本（UI 可选版本） | 待补 | 待补 | model 参数（如 doubao-seedream-4-5-251128） |
+| sampler | sampler_name | Sampling method（串名内嵌 scheduler） | 待补 | 待补 | 待补 |
+| scheduler | scheduler | 内嵌于 Sampling method 串名（Karras 部分） | 待补 | 待补 | 待补 |
 | steps | steps | Sampling steps | 待补 | 待补 | 待补 |
 | cfg | cfg | CFG Scale | 提示词强度（近似） | 待补 | 待补 |
 | seed | seed | Seed | 待补 | 待补 | 待补 |
 | batch_size | batch_size | Batch count | 生成数量 | 待补 | 生成数量 |
-| width / height | width / height | Width / Height | 尺寸选择 | 比例/尺寸 | 尺寸参数 |
+| width / height | width / height | Width / Height | 尺寸选择 | 比例/尺寸 | 尺寸参数（预设桶） |
+| size_bucket | 自由像素（非桶） | 尺寸预设 | 尺寸选择（预设档） | 尺寸选择 | 尺寸预设档 |
 | aspect_ratio | 由 width/height 换算 | 由宽高换算 | 比例选择 | 比例选择 | 比例参数 |
 | hires_fix | Hires.fix | Highres. fix | 待补 | 待补 | 待补 |
 | upscale_scale | upscale_by | Upscaler scale | 待补 | 待补 | 待补 |
