@@ -2,7 +2,7 @@
 
 > 本文件是「资产库（library）」模块的主协议：把 AIGC 从业者的灵感与积累——平时看到的好内容、自己的优秀产出、随手记下的概念——沉淀为**可复用的个人资产**。
 > 覆盖资产类型：图片 / 视频 / 文本 / 概念 / 故事 / 背景·世界观 / 人设 / 角色设计 / 风格 / 场景 / 材质 / 提示词 / 案例。
-> 关联：`knowledge/assets.md`（插件接口契约）· `schema/plan.schema.json`（方案消费槽位）· 工作台看板（展示对接）· `library/sitegen.md`（一键展示站）。
+> 关联：`knowledge/assets.md`（插件接口契约）· `schema/plan.schema.json`（方案消费槽位）· 工作台看板（展示对接）· `library/sitegen.md`（一键展示站）· `library/prompt-curation.md`（kind=prompt 策展规范：来源分级 / 模型分组 / verified 口径）。
 
 ---
 
@@ -39,7 +39,7 @@
 | material | 材质 | 材质参考（金属 / 布料 / 皮肤…） | reference_images / controlnet |
 | object | 物体 | 道具 / 单体物体 | reference_images / controlnet |
 | environment | 环境 | 氛围环境（光线 / 天气 / 时段） | reference_images / style_weight |
-| prompt | 提示词 | 可复用的提示词模板 / 参数卡 | prompt_text / style_weight |
+| prompt | 提示词 | 可复用的提示词模板 / 参数卡；**策展规范见 `library/prompt-curation.md`**（来源分级：仅 DiffusionDB CC0 可入库；按模型分组标注；verified 口径来自方法实验协议） | prompt_text / style_weight |
 | case | 案例 | 需求 → 方案 → 结果 → 归因 的完整案例（进化回路产物） | reference_images / prompt_text |
 | custom | 自定义 | 未归入以上类别的自定义资产 | — |
 

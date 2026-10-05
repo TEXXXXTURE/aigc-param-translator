@@ -5,6 +5,29 @@
   "description": "资产库模块的资产主档字段定义。一个资产 = 一个文件夹（asset.md + media/ + variants/ + notes/）；本 Schema 约束 asset.md 的 frontmatter。介质轴 media × 品类轴 kind 双轴定类。",
   "type": "object",
   "required": ["id", "kind", "media", "name", "created_at", "created_from", "source", "semantics", "version"],
+  "if": {
+    "properties": { "kind": { "const": "prompt" } }
+  },
+  "then": {
+    "required": ["prompt_spec"],
+    "properties": {
+      "prompt_spec": {
+        "type": "object",
+        "description": "prompt 专属字段：适用模型族 / 验证状态 / 来源分级。verified 判定口径见 tools/experiment.md（A 协议门禁）与 library/prompt-curation.md。",
+        "required": ["language", "model_group", "prompt_type", "verified"],
+        "properties": {
+          "language": { "type": "string", "enum": ["zh", "en", "mixed"], "description": "词条语言：zh=中文（自建护城河）/ en=英文 / mixed=双语对照" },
+          "model_group": { "type": "string", "description": "适用模型族/平台，逗号分隔：如 sd15, sdxl, flux, seedream, 即梦, 可灵, comfyui通用；质量词堆砌按模型分组标注，不写万能词串" },
+          "prompt_type": { "type": "string", "enum": ["template", "single", "negative", "quality_modifier", "style_prompt"], "description": "template=可填空模板 / single=单条词 / negative=负面词 / quality_modifier=质量修饰词 / style_prompt=风格提示词" },
+          "verified": { "type": "string", "enum": ["unverified", "verified_by_exp", "verified_by_use"], "description": "unverified=未验证（默认，P0 来源词条）；verified_by_exp=经方法实验协议（≥2 同向案例）验证；verified_by_use=实际使用中反复稳定" },
+          "source_type": { "type": "string", "enum": ["diffusiondb", "curated", "experiment", "import"], "description": "diffusiondb=CC0 种子源 / curated=人工策展（含中文词条）/ experiment=方法实验产出 / import=迁移导入" },
+          "tested_on": { "type": "string", "description": "验证时的模型版本 + 平台，如 doubao-seedream-4-5-251128 / comfyui-sd15" },
+          "effective_range": { "type": "string", "description": "适用任务/需求类型，如 电商主图 / 世界观场景 / 角色一致性" },
+          "notes": { "type": "string", "description": "策展笔记：为什么留 / 拆解要点 / 待验证想法" }
+        }
+      }
+    }
+  },
   "properties": {
     "id": {
       "type": "string",
