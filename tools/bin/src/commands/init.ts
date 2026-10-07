@@ -36,5 +36,5 @@ export function runInit(root: string): void {
 
   console.log(`资产库已初始化：${root}`);
   console.log("结构：00-index.md · library.json · _pending/");
-  console.log("提示：真实资产建议放独立目录（如 C:\\Users\\A\\aigc-library），或用环境变量 AIGC_LIBRARY_ROOT 指向它。");
+  console.log("提示：真实资产建议放独立目录（如 ~/aigc-library 或自选目录），或用环境变量 AIGC_LIBRARY_ROOT 指向它。");
 }
