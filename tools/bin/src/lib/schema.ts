@@ -10,6 +10,7 @@ export const KINDS = [
   "style_anchor",
   "shot",
   "camera_ref",
+  "ui_ref",
   "concept",
   "story",
   "material",

@@ -95,7 +95,7 @@ function ls(root: string): void {
   const rows = walkAssetDirs(root, true)
     .map((d) => {
       try {
-        return loadAsset(d);
+        return loadAsset(d, root);
       } catch {
         return null;
       }
@@ -127,8 +127,10 @@ function approve(root: string, args: Args): void {
     process.exitCode = 1;
     return;
   }
-  const dest = path.join(root, id);
+  const kind = typeof meta.kind === "string" ? meta.kind : "";
+  const dest = kind ? path.join(root, kind, id) : path.join(root, id);
   if (fs.existsSync(dest)) throw new Error(`正式目录已存在同名资产：${id}`);
+  ensureDir(path.dirname(dest));
   fs.renameSync(pendingDir, dest);
   console.log(`已通过门禁：${id} → 正式目录`);
   console.log("运行 ptr index 更新索引 / manifest");

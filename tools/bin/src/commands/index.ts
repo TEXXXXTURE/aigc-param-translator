@@ -15,7 +15,7 @@ export function runIndex(root: string, _args: Args): void {
   const assets = dirs
     .map((d) => {
       try {
-        return loadAsset(d);
+        return loadAsset(d, root);
       } catch (e) {
         console.error(`跳过无法解析的资产目录：${d}（${(e as Error).message}）`);
         return null;

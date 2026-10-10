@@ -26,7 +26,7 @@ export function runValidate(root: string, args: Args): void {
   let total = 0;
   let bad = 0;
   for (const d of dirs) {
-    const a = loadAsset(d);
+    const a = loadAsset(d, root);
     const errs = validateAsset(a);
     total++;
     if (errs.length > 0) {

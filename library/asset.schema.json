@@ -31,13 +31,13 @@
   "properties": {
     "id": {
       "type": "string",
-      "pattern": "^(character|persona|chardesign|costume|scene|worldview|style|shot|concept|story|material|object|environment|prompt|case|style_anchor|camera_ref|custom)\\.[a-z0-9_]+$",
+      "pattern": "^(character|persona|chardesign|costume|scene|worldview|style|shot|concept|story|material|object|environment|prompt|case|style_anchor|camera_ref|ui_ref|custom)\\.[a-z0-9_]+$",
       "description": "资产唯一标识：<kind>.<name>，小写点分，name 内单词用下划线。文件夹名 = id。"
     },
     "kind": {
       "type": "string",
       "description": "品类轴（内容语义）。shot=镜头·摄影风格（焦段/构图/机位/运镜，对应传统镜头编号预设）；costume=人设服饰参考；style_anchor=风格锚基准图（三循环 A 循环产物，独立于 environment 存）；camera_ref=机位/镜头参考（三循环 B 循环产物，白模静帧/参考图）。",
-      "enum": ["character", "persona", "chardesign", "costume", "scene", "worldview", "style", "shot", "concept", "story", "material", "object", "environment", "prompt", "case", "style_anchor", "camera_ref", "custom"]
+      "enum": ["character", "persona", "chardesign", "costume", "scene", "worldview", "style", "shot", "concept", "story", "material", "object", "environment", "prompt", "case", "style_anchor", "camera_ref", "ui_ref", "custom"]
     },
     "media": {
       "type": "string",

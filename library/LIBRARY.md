@@ -1,7 +1,7 @@
 # 资产库模块 · LIBRARY.md（主协议 v0.1）
 
 > 本文件是「资产库（library）」模块的主协议：把 AIGC 从业者的灵感与积累——平时看到的好内容、自己的优秀产出、随手记下的概念——沉淀为**可复用的个人资产**。
-> 覆盖资产类型：图片 / 视频 / 文本 / 概念 / 故事 / 背景·世界观 / 人设 / 角色设计 / 风格 / 场景 / 材质 / 提示词 / 案例。
+> 覆盖资产类型：图片 / 视频 / 文本 / 概念 / 故事 / 背景·世界观 / 人设 / 角色设计 / 风格 / 场景 / 材质 / 提示词 / 案例 / **UI·前端设计参考（`ui_ref`）**。
 > 关联：`knowledge/assets.md`（插件接口契约）· `schema/plan.schema.json`（方案消费槽位）· 工作台看板（展示对接）· `library/sitegen.md`（一键展示站）· `library/prompt-curation.md`（kind=prompt 策展规范：来源分级 / 模型分组 / verified 口径）。
 
 ---
@@ -34,6 +34,7 @@
 | style_anchor | 风格锚基准图 | 三循环 A 循环产物：抽卡 / MJ 反复生图捞出的"对味"基准图，锁色调质感基调；**独立于 environment 存**（ADR-0001） | style_weight / style_anchor / reference_images |
 | shot | 镜头·摄影风格 | 镜头风格（焦段 / 构图 / 机位 / 运镜 / 景深），提示词或图文混合；对应传统影视"镜头编号预设" | prompt_text / controlnet / reference_images |
 | camera_ref | 机位 / 镜头参考 | 三循环 B 循环产物：机位预设静帧 / 白模 blockout 静帧 / 参考图，定构图与巨物感 | camera_ref / controlnet / reference_images |
+| ui_ref | UI · 前端设计参考 | 界面 / 交互 / 组件 / Dashboard / 弹窗 / 设计稿的参考图（非 AIGC 素材，供前端设计取用；来源常见于抖音等平台收藏） | reference_images / prompt_text |
 | concept | 概念 | 点子 / 创意 / 灵感片段（一句话或图文） | prompt_text / story_context |
 | story | 故事 | 剧情 / 故事梗概 / 分镜 / 桥段 | story_context / prompt_text |
 | material | 材质 | 材质参考（金属 / 布料 / 皮肤…） | reference_images / controlnet |
@@ -64,7 +65,9 @@
 ## 3. 命名规范
 
 - 资产 id = **`<kind>.<name>`**，小写点分；name 内单词用下划线。示例：`character.cyberpunk_nomad`、`story.the_last_train`、`style.neon_noir`。
-- **文件夹名 = 资产 id**，同层平铺（不嵌套分类目录，分类靠 kind 前缀 + 索引检索）。
+- **磁盘落点 = `<资产库根>/<kind>/<name>/`**：分类目录 = kind，资产夹名 = name，资产 id 由「目录名 + 夹名」拼回。
+  - **2026-10-10 由「同层平铺」改为分层分类目录**：素材首先是给人看的——分类目录让人打开就能看懂，也让 Agent 逐层下钻、少读无关项（省 token）。原先平铺要解决的多标签问题，改由 `kind` + `tags` 字段承担（主类决定进哪个目录，副类写进 tags，检索照旧命中）。
+  - **兼容**：`ptr` 同时支持分层与旧的平铺结构（`<kind>.<name>/`），迁移期无痛。
 - 版本：`version` 字段用 SemVer（`0.1.0`）；资产内容迭代 +1，id 不变。
 - 命名规范继承早期《资产库标准化规范》的点分范式（ptn./cmp./token. → 此处 kind.name）。
 
@@ -75,11 +78,12 @@
 ├── 00-index.md                  # 总索引：Agent 维护，每资产一行（id / kind / media / name / what / stars / tags）
 ├── library.json                 # 导出 manifest：sitegen 与工作台看板读这份（由 00-index + 各 asset.md 生成）
 ├── _pending/                    # 待入库：未过门禁的采集物（structured 后未 gate 通过）
-└── <kind>.<name>/               # ★ 一个资产 = 一个文件夹
-    ├── asset.md                 # ★ 资产主档：frontmatter（schema 见 library/asset.schema.json）+ 正文
-    ├── media/                   # 媒体原件：原图 / 视频 / 文本 / 音频（文件名可带用途后缀，如 hero.png、ref-01.png）
-    ├── variants/                # 变体：比例版 / 风格版 / LoRA 训练集 / 条件图（controlnet）
-    └── notes/                   # 笔记：灵感来源 / 拆解要点 / 关联方案 / 待验证想法
+└── <kind>/                     # ★ 分类目录（= 品类轴 kind，如 environment / scene / shot / ui_ref）
+    └── <name>/                 # ★ 一个资产 = 一个文件夹（文件夹名 = name）
+        ├── asset.md            # ★ 资产主档：frontmatter（schema 见 library/asset.schema.json）+ 正文
+        ├── media/              # 媒体原件：原图 / 视频 / 文本 / 音频（文件名可带用途后缀，如 hero.png、ref-01.png）
+        ├── variants/           # 变体：比例版 / 风格版 / LoRA 训练集 / 条件图（controlnet）
+        └── notes/              # 笔记：灵感来源 / 拆解要点 / 关联方案 / 待验证想法
 ```
 
 ## 5. asset.md 主档
@@ -124,6 +128,7 @@ version: 0.1.0
 - 图文帖 / 资产卡（多视角成组、摆图、组件拆解）→ 先识别结构：**多视角成组**（同一主体多角度拼接）→ 整卡入库（多文件进一个 `media/`，如 `scene.ruined_tree_city` 4 图成组）或拆卡入库（单体分别建档）；**组件拆解 / 分镜板** → kind=shot。
 - 多视角成组的 character 类：**直接满足 character_card 三面图门禁**（正 / 侧 / 背或多角度成组齐全），无需再补图。
 - 空白底 / 纯色底单体多角度图：优先归 character / chardesign / costume / object / material，是 reference_images / LoRA 训练的理想素材。
+- **界面 / 交互 / 组件 / Dashboard 类截图 → `kind=ui_ref`**（不是 AIGC 素材，供前端设计取用）。判定不得只看标题关键词（实测会把 UI 设计海报误判成美术类）；以图像识别为主、平台标签兜底。
 
 ### 第 2 步 · 结构化 structure
 Agent 读取素材，提取 frontmatter 草稿（kind / media / name / what / tags / suitable_for / source），**交给用户确认后再落盘**（沿用"只填槽不发挥"）。

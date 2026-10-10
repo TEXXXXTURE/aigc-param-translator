@@ -2,9 +2,9 @@ import fs from "fs";
 import path from "path";
 import { ManifestAsset, Manifest } from "../types";
 import { splitFrontmatter } from "./yaml";
-import { listFiles, isImageFile, today } from "./fsx";
+import { listFiles, isImageFile, today, toPosix } from "./fsx";
 
-/** 收集根目录下的正式资产文件夹（<kind>.<name>/asset.md）；可含 _pending */
+/** 收集资产文件夹：兼容两种结构 —— 分层「<kind>/<name>/」与平铺「<kind>.<name>/」；可含 _pending */
 export function walkAssetDirs(root: string, includePending = false): string[] {
   const dirs: string[] = [];
   if (!fs.existsSync(root)) return dirs;
@@ -13,7 +13,16 @@ export function walkAssetDirs(root: string, includePending = false): string[] {
     const p = path.join(root, entry);
     if (!fs.statSync(p).isDirectory()) continue;
     if (entry === "_pending" || entry === "_site") continue;
-    if (isAssetFolder(p)) dirs.push(p);
+    if (isAssetFolder(p)) {
+      dirs.push(p);                       // 平铺结构（兼容旧布局）
+      continue;
+    }
+    for (const sub of fs.readdirSync(p)) {
+      // 再下一层：<kind>/<name>/（分层结构）
+      if (sub.startsWith(".")) continue;
+      const sp = path.join(p, sub);
+      if (fs.statSync(sp).isDirectory() && isAssetFolder(sp)) dirs.push(sp);
+    }
   }
   if (includePending) {
     const pending = path.join(root, "_pending");
@@ -28,13 +37,13 @@ export function walkAssetDirs(root: string, includePending = false): string[] {
   return dirs.sort();
 }
 
+/** 资产夹判定：含 asset.md 即可（分层后文件夹名是纯 name，不再带 kind 前缀） */
 export function isAssetFolder(dir: string): boolean {
-  const base = path.basename(dir);
-  return /^[a-z]+\.[a-z0-9_]+$/.test(base) && fs.existsSync(path.join(dir, "asset.md"));
+  return fs.existsSync(path.join(dir, "asset.md"));
 }
 
 /** 读取一个资产文件夹 → manifest 条目；解析失败抛错 */
-export function loadAsset(dir: string): ManifestAsset {
+export function loadAsset(dir: string, root?: string): ManifestAsset {
   const mdPath = path.join(dir, "asset.md");
   if (!fs.existsSync(mdPath)) throw new Error(`缺少 asset.md: ${dir}`);
   const md = fs.readFileSync(mdPath, "utf8");
@@ -43,12 +52,16 @@ export function loadAsset(dir: string): ManifestAsset {
   const variantFiles = listFiles(path.join(dir, "variants"));
   const all = [...mediaFiles, ...variantFiles];
   const thumbFile = all.find((p) => isImageFile(p)) ?? null;
+  const base = path.basename(dir);
+  const parent = path.basename(path.dirname(dir));
+  // 分层结构下文件夹名是纯 name，id 由「分类目录名 + 文件夹名」拼回
+  const guessId = /^[a-z]+\.[a-z0-9_]+$/.test(base) ? base : `${parent}.${base}`;
   const id =
-    typeof meta.id === "string" && meta.id ? meta.id : path.basename(dir);
+    typeof meta.id === "string" && meta.id ? meta.id : guessId;
   return {
     ...(meta as Record<string, unknown> as ManifestAsset),
     id,
-    folder: path.basename(dir),
+    folder: root ? toPosix(path.relative(root, dir)) : base,
     files: all.map((p) => path.basename(p)),
     thumb: thumbFile ? path.basename(thumbFile) : null,
     body,
